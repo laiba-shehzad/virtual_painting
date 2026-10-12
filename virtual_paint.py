@@ -2,7 +2,6 @@ import cv2
 import numpy as np
 import mediapipe as mp
 
-# MediaPipe setup
 mp_hands = mp.solutions.hands
 mp_draw = mp.solutions.drawing_utils
 
@@ -12,14 +11,9 @@ hands = mp_hands.Hands(
     min_tracking_confidence=0.5
 )
 
-# Camera
 cap = cv2.VideoCapture(0)
-
-# Canvas
 canvas = np.zeros((480, 640, 3), np.uint8)
-
 px, py = 0, 0
-
 print("Press 'q' to exit")
 
 while True:
@@ -41,14 +35,11 @@ while True:
             lm = hand_lms.landmark
             h, w, _ = img.shape
 
-            # Index finger
             ix, iy = int(lm[8].x * w), int(lm[8].y * h)
 
-            # Finger states
             index_up = lm[8].y < lm[6].y
             middle_up = lm[12].y < lm[10].y
 
-            # Mode selection
             if index_up and middle_up:
                 mode = "erase"
             elif index_up:
@@ -56,7 +47,6 @@ while True:
             else:
                 mode = "none"
 
-            # Drawing logic
             if mode == "draw" or mode == "erase":
 
                 if px == 0 and py == 0:
@@ -73,15 +63,11 @@ while True:
                                 cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
                 px, py = ix, iy
-
             else:
-                # STOP when hand closed or fingers down
                 px, py = 0, 0
-
     else:
         px, py = 0, 0
 
-    # Merge canvas with camera
     img_gray = cv2.cvtColor(canvas, cv2.COLOR_BGR2GRAY)
     _, img_inv = cv2.threshold(img_gray, 50, 255, cv2.THRESH_BINARY_INV)
     img_inv = cv2.cvtColor(img_inv, cv2.COLOR_GRAY2BGR)
